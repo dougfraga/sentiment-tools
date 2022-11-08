@@ -1,4 +1,4 @@
-import numpy as np
+import re 
 import pandas as pd
 import matplotlib.pyplot as plt
 from collections import Counter
@@ -12,19 +12,34 @@ def count_sentiments(df):
 
 
 def count_words(df):
-    words = ' '.join(df.text)
+    stopwords = ['', 'da', 'a', 'o', 'do', 'de', 'e', 'que', 'é', 'para',
+                 'na', 'no', 'pra', 'com', 'não', 'um', 'se', 'eu', 'em',
+                 'os', 'mas', 'foi', 'só', 'uma', 'mais', 'sobre', 'muito',
+                 'essa', 'por', 'ele', 'tem', 'ser', 'já', 'dos']
+    words = ' '.join(df.text).lower()
+    words = re.sub('[.,!?]', '', words)
     words = words.split(' ')
-    count = Counter(words).most_common(10)
-    return count
+    resultwords  = [word for word in words if word not in stopwords]
+    count = Counter(resultwords).most_common(10)
+    word = []
+    freq = []
+    for w in count:
+        word.append(w[0])
+        freq.append(w[1])
+    
+    dfr = pd.DataFrame({'word': word, 'freq': freq}) 
+    
+    return dfr
 
-def func(count):
-    return "{:.1f}%\n({:d} g)".format(count)
 
-count = count_sentiments(df)
-words = count_words(df)
-plt.figure()
-#plt.pie(count, autopct=lambda pct: func(count),
-#                                  textprops=dict(color="w"))
-plt.savefig('teste.png')
-print(count)
-print(words)
+if __name__ == '__main__':
+    count = count_sentiments(df)
+    count.to_excel('sentimentos.xlsx')
+    words = count_words(df)
+    fig, ax = plt.subplots(figsize =(16, 9))
+    bar_chart = ax.barh(words.word, words.freq)
+    ax.invert_yaxis()
+    ax.bar_label(bar_chart,labels=words.freq)
+    plt.title('Quantidade de palavras')
+    plt.savefig('bar_words.png')
+

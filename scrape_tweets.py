@@ -7,7 +7,7 @@ from googletrans import Translator
 
 
 query = 'Convocação da seleção since:2022-11-07 until:2022-11-08'
-maxTweets = 100
+maxTweets = 500
 
 
 # Functions
